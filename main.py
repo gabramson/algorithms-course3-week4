@@ -3,6 +3,7 @@
 Module Docstring
 """
 import KnapsackPacker
+import sys
 
 
 __author__ = "Your Name"
@@ -12,6 +13,7 @@ __license__ = "MIT"
 
 def main():
     """ Main entry point of the app """
+    sys.setrecursionlimit(3000)
     myfile = open("knapsack_big.txt", "r")
     parameters = myfile.readline().split()
     knapsack_packer = KnapsackPacker.KnapsackPacker(int(parameters[0]), int(parameters[1]))

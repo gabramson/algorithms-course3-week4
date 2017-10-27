@@ -2,31 +2,41 @@ import numpy as np
 
 class KnapsackPacker:
     def __init__(self, max_weight, items_count):
-        self.max_weight = max_weight
+        self.max_weight = int(max_weight)
         self.max_item = 0
-        self.items_count = items_count
+        self.items_count = int(items_count)
         self.items = np.empty([items_count, 2])
+        self.lookup = {}
 
     def add_item(self, weight, value):
-        self.items[self.max_item][0] = weight
-        self.items[self.max_item][1] = value
+        self.items[self.max_item][0] = int(weight)
+        self.items[self.max_item][1] = int(value)
         self.max_item += 1
 
     def get_max_value(self):
-        last_values = np.zeros(self.max_weight+1)
-        next_values = np.empty(self.max_weight+1)
-        for i in range(0, self.items_count):
-            if i%100 == 0:
-                print(i)
-            w = int(self.items[i][0])
-            v = int(self.items[i][1])
-            for x in range(0, self.max_weight+1):
-                if w > x:
-                    next_values[x] = last_values[x]
-                    continue
-                next_values[x] = self.get_maximum(last_values[x], last_values[x-w]+v)
-            last_values = np.copy(next_values)
-        return next_values[self.max_weight]
+        retval = self.__get_subproblem(self.max_weight, self.items_count)
+        return retval
 
-    def get_maximum(self, a, b):
+    def __get_subproblem(self, weight, item):
+        if item == 0 or weight == 0:
+            return 0
+        if (weight, item) in self.lookup.keys():
+            return self.lookup.get((weight, item))
+        item_weight = self.items[item-1][0]
+        item_value = self.items[item-1][1]
+        if item == 1 and weight < item_weight:
+            return 0
+        if item == 1 and weight >= item_weight:
+            return item_weight
+        if weight < item_weight:
+            best_value = self.__get_subproblem(weight, item-1)
+            self.lookup[weight, item] = best_value
+            return best_value
+        case1 = self.__get_subproblem(weight, item-1)
+        case2 = self.__get_subproblem(weight-int(item_weight), item-1)+item_value
+        best_value = self.__get_maximum(case1, case2)
+        self.lookup[weight, item] = best_value
+        return best_value
+
+    def __get_maximum(self, a, b):
         return a if a > b else b
