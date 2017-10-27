@@ -18,23 +18,20 @@ class KnapsackPacker:
         return retval
 
     def __get_subproblem(self, weight, item):
-        if item == 0 or weight == 0:
+        if item == 0:
             return 0
         if (weight, item) in self.lookup.keys():
             return self.lookup.get((weight, item))
         item_weight = self.items[item-1][0]
-        item_value = self.items[item-1][1]
-        if item == 1 and weight < item_weight:
-            return 0
         if item == 1 and weight >= item_weight:
             return item_weight
-        if weight < item_weight:
-            best_value = self.__get_subproblem(weight, item-1)
-            self.lookup[weight, item] = best_value
-            return best_value
         case1 = self.__get_subproblem(weight, item-1)
-        case2 = self.__get_subproblem(weight-int(item_weight), item-1)+item_value
-        best_value = self.__get_maximum(case1, case2)
+        if weight < item_weight:
+            best_value = case1
+        else:
+            item_value = self.items[item-1][1]
+            case2 = self.__get_subproblem(weight-int(item_weight), item-1)+item_value
+            best_value = self.__get_maximum(case1, case2)
         self.lookup[weight, item] = best_value
         return best_value
 
